@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
     private static final String AN_ERROR_OCCURRED = "An error occurred with our services";
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.internalServerError().body(
                 ErrorResponse.builder()
