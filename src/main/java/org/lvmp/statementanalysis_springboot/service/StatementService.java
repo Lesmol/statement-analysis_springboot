@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.textract.TextractClient;
+import software.amazon.awssdk.services.textract.model.DetectDocumentTextRequest;
+import software.amazon.awssdk.services.textract.model.Document;
+import software.amazon.awssdk.services.textract.model.S3Object;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -18,6 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StatementService {
     private final S3Client s3Client;
+    private final TextractClient textractClient;
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
@@ -37,6 +42,19 @@ public class StatementService {
                         request.getFile().getSize()
                 )
         );
+
+        Document document = Document.builder()
+                .s3Object(S3Object.builder()
+                        .bucket(bucketName)
+                        .name(filename)
+                        .build())
+                .build();
+
+        DetectDocumentTextRequest detectDocumentTextRequest = DetectDocumentTextRequest.builder()
+                .document(document)
+                .build();
+
+        textractClient.detectDocumentText(detectDocumentTextRequest);
 
         return ResponseEntity.ok().build();
     }
