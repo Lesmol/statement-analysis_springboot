@@ -1,3 +1,7 @@
 spring:
   application:
     name: statement-analysis_springboot
+aws:
+  s3:
+    bucket-name: ${AWS_S3_BUCKET_NAME}
+  region: ${AWS_REGION}

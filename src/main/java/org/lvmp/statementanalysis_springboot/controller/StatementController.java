@@ -1,11 +1,16 @@
 package org.lvmp.statementanalysis_springboot.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.lvmp.statementanalysis_springboot.model.UploadDocumentRequest;
 import org.lvmp.statementanalysis_springboot.service.StatementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("api/v1")
@@ -14,8 +19,8 @@ public class StatementController {
     private final StatementService statementService;
 
     @PostMapping("/upload-document")
-    public ResponseEntity<Void> uploadDocument() {
-        return statementService.uploadDocument();
+    public ResponseEntity<Void> uploadDocument(@Valid @RequestPart("file") UploadDocumentRequest request) throws IOException {
+        return statementService.uploadDocument(request);
     }
 
     @PostMapping("/analyse-document")
