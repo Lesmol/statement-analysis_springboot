@@ -12,6 +12,11 @@ public class S3Config {
     @Value("${aws.region}")
     private String region;
 
+    /**
+     * Create and configure an AWS S3 client using the application's configured AWS region.
+     *
+     * @return an S3Client configured for the AWS region specified by the `aws.region` application property
+     */
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()

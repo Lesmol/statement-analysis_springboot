@@ -26,6 +26,13 @@ public class StatementService {
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
+    /**
+     * Uploads the provided document to the configured S3 bucket, requests AWS Textract to detect text in the uploaded object, and returns a success response.
+     *
+     * @param request the request containing the file to upload and analyze
+     * @return an HTTP 200 (OK) response with an empty body
+     * @throws IOException if reading the provided file's input stream fails
+     */
     public ResponseEntity<Void> uploadDocument(UploadDocumentRequest request) throws IOException {
         String filename = UUID.randomUUID().toString();
 
@@ -59,6 +66,13 @@ public class StatementService {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Triggers document analysis and returns an empty success response.
+     *
+     * Currently this method is a stub and does not perform any analysis.
+     *
+     * @return HTTP 200 OK with an empty body.
+     */
     public ResponseEntity<Void> analyseDocument() {
         return ResponseEntity.ok().build();
     }

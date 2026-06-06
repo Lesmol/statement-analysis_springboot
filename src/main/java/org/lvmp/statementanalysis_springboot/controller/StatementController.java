@@ -18,11 +18,23 @@ import java.io.IOException;
 public class StatementController {
     private final StatementService statementService;
 
+    /**
+     * Accepts a multipart request part named "file" and initiates document upload processing.
+     *
+     * @param request the multipart upload payload bound from the request part named "file"; validated before processing
+     * @return a ResponseEntity with no body that represents the outcome of the upload operation
+     * @throws IOException if an I/O error occurs while handling the uploaded file
+     */
     @PostMapping("/upload-document")
     public ResponseEntity<Void> uploadDocument(@Valid @RequestPart("file") UploadDocumentRequest request) throws IOException {
         return statementService.uploadDocument(request);
     }
 
+    /**
+     * Initiates analysis of previously uploaded documents.
+     *
+     * @return an HTTP response with no body indicating the result of the analysis operation
+     */
     @PostMapping("/analyse-document")
     public ResponseEntity<Void> analyseDocument() {
         return statementService.analyseDocument();

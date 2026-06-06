@@ -19,6 +19,12 @@ public class GlobalExceptionHandler {
 
     private static final String IO_EXCEPTION_DESCRIPTION = "An error occurred when processing your file. Please try uploading it again.";
 
+    /**
+     * Handles bean validation failures and produces a 400 Bad Request ErrorResponse.
+     *
+     * @param e the MethodArgumentNotValidException containing validation errors
+     * @return a ResponseEntity with status 400 and an ErrorResponse whose message is VALIDATION_FAILED and whose description is a comma-separated list of "field: message" entries for each field error
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage(), e);
@@ -35,6 +41,12 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Handles IO-related failures during request handling and maps them to an HTTP 500 response.
+     *
+     * @param e the IOException that occurred during file or I/O processing
+     * @return a ResponseEntity with status 500 containing an ErrorResponse whose message indicates a file/IO error and whose description provides a fixed user-facing explanation
+     */
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ErrorResponse> handleIOException(IOException e) {
         log.error(e.getMessage(), e);
@@ -46,6 +58,12 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * Handles uncaught exceptions and returns a generic internal server error response.
+     *
+     * @param e the unhandled exception that triggered this handler
+     * @return a ResponseEntity with HTTP 500 and an ErrorResponse containing a generic error message and the exception's message as the description
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error(e.getMessage(), e);

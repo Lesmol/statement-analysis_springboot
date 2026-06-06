@@ -12,6 +12,11 @@ public class TextractConfig {
     @Value("${aws.region}")
     private String region;
 
+    /**
+     * Create a TextractClient configured with the application's AWS region.
+     *
+     * @return a TextractClient configured to use the region specified by the `aws.region` property
+     */
     @Bean
     public TextractClient textractClient() {
         return TextractClient.builder()
