@@ -43,7 +43,7 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: email-api
+          ECR_REPOSITORY: statement-analysis-repository
           IMAGE_TAG: ${{ steps.short-sha.outputs.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
@@ -70,4 +70,4 @@ jobs:
         run: |
           aws lambda update-function-code \
           --function-name statement-analysis-function \
-          --image-uri ${{ needs.build.outputs.REGISTRY }}/email-api:${{ needs.build.outputs.short_sha }}
+          --image-uri ${{ needs.build.outputs.REGISTRY }}/statement-analysis-repository:${{ needs.build.outputs.short_sha }}
