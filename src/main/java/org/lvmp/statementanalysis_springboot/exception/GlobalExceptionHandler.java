@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.exception.SdkServiceException;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -15,9 +17,9 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private static final String AN_ERROR_OCCURRED = "An error occurred with our services";
     private static final String VALIDATION_FAILED = "Validation failed";
-    private static final String IO_EXCEPTION = "File processing failed";
+    private static final String FILE_PROCESSING_FAILED = "File processing failed";
 
-    private static final String IO_EXCEPTION_DESCRIPTION = "An error occurred when processing your file. Please try uploading it again.";
+    private static final String FILE_PROCESSING_FAILED_DESCRIPTION = "An error occurred when processing your file. Please try uploading it again.";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleArgumentNotValidException(MethodArgumentNotValidException e) {
@@ -35,13 +37,13 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<ErrorResponse> handleIOException(IOException e) {
+    @ExceptionHandler({IOException.class, SdkClientException.class, SdkServiceException.class})
+    public ResponseEntity<ErrorResponse> handleIOException(Exception e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.internalServerError().body(
                 ErrorResponse.builder()
-                        .message(IO_EXCEPTION)
-                        .description(IO_EXCEPTION_DESCRIPTION)
+                        .message(FILE_PROCESSING_FAILED)
+                        .description(FILE_PROCESSING_FAILED_DESCRIPTION)
                         .build()
         );
     }

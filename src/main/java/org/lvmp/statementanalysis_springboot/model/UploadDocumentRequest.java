@@ -1,6 +1,6 @@
 package org.lvmp.statementanalysis_springboot.model;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UploadDocumentRequest {
-    @NotEmpty(message = "File cannot be empty")
+    @NotNull(message = "File cannot be empty")
     @PdfFile(message = "File must be a valid PDF")
     private MultipartFile file;
 }
