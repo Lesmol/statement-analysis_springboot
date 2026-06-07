@@ -4,7 +4,7 @@ spring:
 aws:
   s3:
     bucket-name: ${AWS_S3_BUCKET_NAME}
-  region: ${AWS_REGION}
+  region: ${TEXTRACT_AWS_REGION}
 logging:
   structured:
     format:
