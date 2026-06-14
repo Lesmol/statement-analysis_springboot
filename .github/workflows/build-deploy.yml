@@ -29,7 +29,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: af-south-1
+          aws-region: ${{ vars.AWS_REGION }}
 
       - uses: benjlevesque/short-sha@v3.0
         id: short-sha
@@ -65,7 +65,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: af-south-1
+          aws-region: ${{ vars.AWS_REGION }}
       - name: Update Lambda Container Image
         run: |
           aws lambda update-function-code \
