@@ -5,6 +5,10 @@ aws:
   s3:
     bucket-name: ${AWS_S3_BUCKET_NAME}
   region: ${TEXTRACT_AWS_REGION}
+  sns:
+    topic: ${AWS_SNS_TOPIC}
+    role: ${AWS_SNS_ROLE}
+
 logging:
   structured:
     format:
