@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.lvmp.statementanalysis_springboot.model.ForcePasswordChangeRequest;
 import org.lvmp.statementanalysis_springboot.model.LoginRequest;
 import org.lvmp.statementanalysis_springboot.model.LoginResponse;
+import org.lvmp.statementanalysis_springboot.model.LogoutRequest;
 import org.lvmp.statementanalysis_springboot.service.CognitoAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,12 @@ public class AuthenticationController {
     @PostMapping("/force-password-change")
     public ResponseEntity<LoginResponse> forcePasswordChange(@RequestBody @Valid ForcePasswordChangeRequest request) {
         return authService.forcePasswordChange(request);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody @Valid LogoutRequest request) {
+        authService.logout(request);
+        return ResponseEntity.noContent().build();
     }
 
 }

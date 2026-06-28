@@ -6,6 +6,7 @@ import org.lvmp.statementanalysis_springboot.exception.AuthenticationException;
 import org.lvmp.statementanalysis_springboot.model.ForcePasswordChangeRequest;
 import org.lvmp.statementanalysis_springboot.model.LoginRequest;
 import org.lvmp.statementanalysis_springboot.model.LoginResponse;
+import org.lvmp.statementanalysis_springboot.model.LogoutRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -115,6 +116,18 @@ public class CognitoAuthService {
         } catch (Exception e) {
             log.error("Unexpected error during force password change", e);
             throw new AuthenticationException("Password change failed. Please try again.");
+        }
+    }
+
+    public void logout(LogoutRequest request) {
+        try {
+            GlobalSignOutRequest signOutRequest = GlobalSignOutRequest.builder()
+                    .accessToken(request.getAccessToken())
+                    .build();
+            cognitoClient.globalSignOut(signOutRequest);
+        } catch (Exception e) {
+            log.error("Unexpected error during logout", e);
+            throw new AuthenticationException("Logout failed. Please try again.");
         }
     }
 
