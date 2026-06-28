@@ -24,9 +24,9 @@ public class CognitoAuthService {
 
     private final CognitoIdentityProviderClient cognitoClient;
 
-    @Value("aws.cognito.client-secret")
+    @Value("${aws.cognito.client-secret}")
     private String clientSecret;
-    @Value("aws.cognito.client-id")
+    @Value("${aws.cognito.client-id}")
     private String clientId;
 
     public LoginResponse login(LoginRequest request) {
