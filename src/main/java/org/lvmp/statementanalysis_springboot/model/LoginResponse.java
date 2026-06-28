@@ -11,4 +11,6 @@ public class LoginResponse {
     private String refreshToken;
     private Integer expiresIn;
     private String tokenType;
+    private boolean requiresPasswordChange;
+    private String session;
 }
