@@ -33,6 +33,7 @@ public class CognitoAuthService {
     private String clientId;
 
     public ResponseEntity<LoginResponse> loginWithPassword(LoginRequest request) {
+        log.info("{} initiated login with password", request.getUsername());
         var authParams = buildAuthParams(request.getUsername(), request.getPassword());
 
         try {
@@ -87,6 +88,7 @@ public class CognitoAuthService {
     }
 
     public ResponseEntity<LoginResponse> forcePasswordChange(ForcePasswordChangeRequest request) {
+        log.info("{} initiated force password change", request.getUsername());
         try {
             Map<String, String> challengeResponses = new HashMap<>();
             challengeResponses.put("USERNAME", request.getUsername());
@@ -120,6 +122,7 @@ public class CognitoAuthService {
     }
 
     public void logout(LogoutRequest request) {
+        log.info("Initiated logout");
         try {
             GlobalSignOutRequest signOutRequest = GlobalSignOutRequest.builder()
                     .accessToken(request.getAccessToken())
