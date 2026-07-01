@@ -52,7 +52,7 @@ public class StatementService {
 
 
     private String initiateTextract(String filename) {
-        StartDocumentTextDetectionResponse response = null;
+        StartDocumentAnalysisResponse response = null;
         String jobId = "";
 
         try {
@@ -74,16 +74,17 @@ public class StatementService {
                     .roleArn(roleArn)
                     .build();
 
-            StartDocumentTextDetectionRequest textDetectionRequest =
-                    StartDocumentTextDetectionRequest
+            StartDocumentAnalysisRequest documentAnalysisRequest =
+                    StartDocumentAnalysisRequest
                             .builder()
                             .documentLocation(document)
                             .clientRequestToken(filename)
                             .notificationChannel(sns)
+                            .featureTypes(FeatureType.TABLES)
                             .jobTag("Statement")
                             .build();
 
-            response = textractClient.startDocumentTextDetection(textDetectionRequest);
+            response = textractClient.startDocumentAnalysis(documentAnalysisRequest);
 
             jobId = !response.jobId().isEmpty()
                     ? response.jobId() : "";
