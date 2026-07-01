@@ -49,17 +49,31 @@ public class StatementService {
         );
         log.info("Successfully uploaded object ({}) to s3", filename);
 
-        StartDocumentTextDetectionRequest startRequest = StartDocumentTextDetectionRequest.builder()
-                .documentLocation(DocumentLocation.builder()
-                        .s3Object(S3Object.builder()
-                                .bucket(bucketName)
-                                .name(filename)
+        StartDocumentAnalysisRequest startRequest =
+                StartDocumentAnalysisRequest
+                        .builder()
+                        .documentLocation(DocumentLocation.builder()
+                                .s3Object(S3Object.builder()
+                                        .bucket(bucketName)
+                                        .name(filename)
+                                        .build())
                                 .build())
-                        .build())
-                .build();
+                        .clientRequestToken(filename)
+                        .notificationChannel(
+                                NotificationChannel
+                                        .builder()
+                                        .snsTopicArn(snsTopicArn)
+                                        .roleArn(roleArn)
+                                        .build()
+                        )
+                        .featureTypes(FeatureType.TABLES)
+                        .jobTag("Statement")
+                        .build();
 
-        StartDocumentTextDetectionResponse response = textractClient.startDocumentTextDetection(startRequest);
+        StartDocumentAnalysisResponse response = textractClient.startDocumentAnalysis(startRequest);
         log.info("Textract jobId: {}", response.jobId());
+
+        
 
         return ResponseEntity.accepted()
                 .body(UploadDocumentResponse.builder()
