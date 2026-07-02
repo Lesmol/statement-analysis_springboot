@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.exception.SdkServiceException;
 
@@ -75,32 +73,5 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(HandlerMethodValidationException e) {
-        log.error(e.getMessage(), e);
 
-        String validationMessage = e.getParameterValidationResults().stream()
-                .flatMap(result -> result.getResolvableErrors().stream())
-                .map(org.springframework.context.MessageSourceResolvable::getDefaultMessage)
-                .findFirst()
-                .orElse("Invalid file upload");
-
-        return ResponseEntity.badRequest().body(
-                ErrorResponse.builder()
-                        .message("Validation Failed")
-                        .description(validationMessage) // Contains your custom message
-                        .build()
-        );
-    }
-
-    @ExceptionHandler(AwsServiceException.class)
-    public ErrorResponse handleAwsSeviceException(Exception e) {
-        log.error(e.getMessage(), e);
-        return ResponseEntity.internalServerError().body(
-                ErrorResponse.builder()
-                        .message(AN_ERROR_OCCURRED)
-                        .description(e.getMessage())
-                        .build()
-        );
-    }
 }
