@@ -1,5 +1,6 @@
 package org.lvmp.statementanalysis_springboot.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.model.UploadDocumentRequest;
@@ -11,10 +12,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.textract.TextractClient;
-import software.amazon.awssdk.services.textract.model.DocumentLocation;
-import software.amazon.awssdk.services.textract.model.S3Object;
-import software.amazon.awssdk.services.textract.model.StartDocumentTextDetectionRequest;
-import software.amazon.awssdk.services.textract.model.StartDocumentTextDetectionResponse;
+import software.amazon.awssdk.services.textract.model.*;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -27,6 +25,12 @@ public class StatementService {
     private final TextractClient textractClient;
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
+
+    @Value("${aws.sns.topic}")
+    private String snsTopicArn;
+
+    @Value("${aws.sns.role}")
+    private String roleArn;
 
     public ResponseEntity<UploadDocumentResponse> uploadDocument(UploadDocumentRequest request) throws IOException {
         String filename = UUID.randomUUID().toString();
@@ -46,23 +50,47 @@ public class StatementService {
         );
         log.info("Successfully uploaded object ({}) to s3", filename);
 
-        StartDocumentTextDetectionRequest startRequest = StartDocumentTextDetectionRequest.builder()
-                .documentLocation(DocumentLocation.builder()
-                        .s3Object(S3Object.builder()
-                                .bucket(bucketName)
-                                .name(filename)
+        StartDocumentAnalysisRequest startRequest =
+                StartDocumentAnalysisRequest
+                        .builder()
+                        .documentLocation(DocumentLocation.builder()
+                                .s3Object(S3Object.builder()
+                                        .bucket(bucketName)
+                                        .name(filename)
+                                        .build())
                                 .build())
-                        .build())
-                .build();
+                        .clientRequestToken(filename)
+                        .notificationChannel(
+                                NotificationChannel
+                                        .builder()
+                                        .snsTopicArn(snsTopicArn)
+                                        .roleArn(roleArn)
+                                        .build()
+                        )
+                        .featureTypes(FeatureType.TABLES)
+                        .jobTag("Statement")
+                        .build();
 
-        StartDocumentTextDetectionResponse response = textractClient.startDocumentTextDetection(startRequest);
+        StartDocumentAnalysisResponse response = textractClient.startDocumentAnalysis(startRequest);
         log.info("Textract jobId: {}", response.jobId());
+
+        
 
         return ResponseEntity.accepted()
                 .body(UploadDocumentResponse.builder()
                         .jobId(response.jobId())
                         .build()
                 );
+    }
+
+    @PostConstruct
+    public void validateSnsConfig() {
+        if (snsTopicArn == null || snsTopicArn.isBlank()) {
+            throw new IllegalStateException("snsTopicArn must not be blank");
+        }
+        if (roleArn == null || roleArn.isBlank()) {
+            throw new IllegalStateException("roleArn must not be blank");
+        }
     }
 
     public ResponseEntity<Void> analyseDocument() {

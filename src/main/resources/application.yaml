@@ -8,6 +8,10 @@ aws:
     client-secret: ${COGNITO_CLIENT_SECRET}
   s3:
     bucket-name: ${AWS_S3_BUCKET_NAME}
+  sns:
+    topic: ${AWS_SNS_TOPIC}
+    role: ${AWS_SNS_ROLE}
+
 logging:
   structured:
     format:
