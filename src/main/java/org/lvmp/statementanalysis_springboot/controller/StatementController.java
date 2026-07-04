@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("api/v1/statement-analysis")
+@RequestMapping("/api/v1/statement-analysis")
 @RequiredArgsConstructor
 public class StatementController {
     private final StatementService statementService;
