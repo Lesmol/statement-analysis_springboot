@@ -1,5 +1,6 @@
 package org.lvmp.statementanalysis_springboot.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.model.UploadDocumentRequest;
@@ -80,6 +81,16 @@ public class StatementService {
                         .jobId(response.jobId())
                         .build()
                 );
+    }
+
+    @PostConstruct
+    public void validateSnsConfig() {
+        if (snsTopicArn == null || snsTopicArn.isBlank()) {
+            throw new IllegalStateException("snsTopicArn must not be blank");
+        }
+        if (roleArn == null || roleArn.isBlank()) {
+            throw new IllegalStateException("roleArn must not be blank");
+        }
     }
 
     public ResponseEntity<Void> analyseDocument() {
