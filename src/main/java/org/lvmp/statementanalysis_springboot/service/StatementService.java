@@ -50,6 +50,8 @@ public class StatementService {
         );
         log.info("Successfully uploaded object ({}) to s3", filename);
 
+        String prefix = "output/" + filename + "/";
+
         StartDocumentAnalysisRequest startRequest =
                 StartDocumentAnalysisRequest
                         .builder()
@@ -67,14 +69,17 @@ public class StatementService {
                                         .roleArn(roleArn)
                                         .build()
                         )
+                        .outputConfig(OutputConfig
+                                .builder()
+                                .s3Bucket(bucketName)
+                                .s3Prefix(prefix)
+                                .build())
                         .featureTypes(FeatureType.TABLES)
                         .jobTag("Statement")
                         .build();
 
         StartDocumentAnalysisResponse response = textractClient.startDocumentAnalysis(startRequest);
         log.info("Textract jobId: {}", response.jobId());
-
-        
 
         return ResponseEntity.accepted()
                 .body(UploadDocumentResponse.builder()
