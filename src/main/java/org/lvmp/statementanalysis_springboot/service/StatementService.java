@@ -81,8 +81,6 @@ public class StatementService {
         StartDocumentAnalysisResponse response = textractClient.startDocumentAnalysis(startRequest);
         log.info("Textract jobId: {}", response.jobId());
 
-        
-
         return ResponseEntity.accepted()
                 .body(UploadDocumentResponse.builder()
                         .jobId(response.jobId())
