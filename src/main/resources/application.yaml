@@ -13,7 +13,7 @@ aws:
     role: ${AWS_SNS_ROLE}
 
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
 
 logging:
   structured:
