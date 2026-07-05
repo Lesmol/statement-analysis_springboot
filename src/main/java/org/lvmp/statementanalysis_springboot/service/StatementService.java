@@ -50,6 +50,8 @@ public class StatementService {
         );
         log.info("Successfully uploaded object ({}) to s3", filename);
 
+        String prefix = "output/" + filename + "/";
+
         StartDocumentAnalysisRequest startRequest =
                 StartDocumentAnalysisRequest
                         .builder()
@@ -70,7 +72,7 @@ public class StatementService {
                         .outputConfig(OutputConfig
                                 .builder()
                                 .s3Bucket(bucketName)
-                                .s3Prefix(getFolderPrefix(filename))
+                                .s3Prefix(prefix)
                                 .build())
                         .featureTypes(FeatureType.TABLES)
                         .jobTag("Statement")
@@ -96,11 +98,6 @@ public class StatementService {
         if (roleArn == null || roleArn.isBlank()) {
             throw new IllegalStateException("roleArn must not be blank");
         }
-    }
-
-    private String getFolderPrefix(String key) {
-        int lastSlash = key.lastIndexOf('/');
-        return lastSlash >= 0 ? key.substring(0, lastSlash + 1) : "";
     }
 
     public ResponseEntity<Void> analyseDocument() {
