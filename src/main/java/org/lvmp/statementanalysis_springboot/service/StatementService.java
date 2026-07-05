@@ -67,6 +67,11 @@ public class StatementService {
                                         .roleArn(roleArn)
                                         .build()
                         )
+                        .outputConfig(OutputConfig
+                                .builder()
+                                .s3Bucket(bucketName)
+                                .s3Prefix(getFolderPrefix(filename))
+                                .build())
                         .featureTypes(FeatureType.TABLES)
                         .jobTag("Statement")
                         .build();
@@ -91,6 +96,11 @@ public class StatementService {
         if (roleArn == null || roleArn.isBlank()) {
             throw new IllegalStateException("roleArn must not be blank");
         }
+    }
+
+    private String getFolderPrefix(String key) {
+        int lastSlash = key.lastIndexOf('/');
+        return lastSlash >= 0 ? key.substring(0, lastSlash + 1) : "";
     }
 
     public ResponseEntity<Void> analyseDocument() {
