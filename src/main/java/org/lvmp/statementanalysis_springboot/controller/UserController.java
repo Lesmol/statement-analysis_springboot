@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("api/user/v1")
+@RequestMapping("/api/user/v1")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
