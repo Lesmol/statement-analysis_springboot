@@ -21,10 +21,10 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/")
-    public ResponseEntity<Void> getUser(HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> getUser(HttpServletRequest request) {
         Map<String, String> headers = Collections.list(request.getHeaderNames()).stream()
                 .collect(Collectors.toMap(h -> h, request::getHeader));
         log.info("Request headers: {}", headers);
-        return userService.getUser();
+        return ResponseEntity.ok(headers);
     }
 }
