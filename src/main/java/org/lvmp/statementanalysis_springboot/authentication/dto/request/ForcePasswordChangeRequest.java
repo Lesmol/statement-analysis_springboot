@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.model;
+package org.lvmp.statementanalysis_springboot.authentication.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

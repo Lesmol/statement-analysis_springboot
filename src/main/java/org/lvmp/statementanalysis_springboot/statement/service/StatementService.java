@@ -1,11 +1,11 @@
-package org.lvmp.statementanalysis_springboot.service;
+package org.lvmp.statementanalysis_springboot.statement.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.context.UserContext;
-import org.lvmp.statementanalysis_springboot.model.UploadDocumentRequest;
-import org.lvmp.statementanalysis_springboot.model.UploadDocumentResponse;
+import org.lvmp.statementanalysis_springboot.statement.dto.request.UploadDocumentRequest;
+import org.lvmp.statementanalysis_springboot.statement.dto.response.UploadDocumentResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

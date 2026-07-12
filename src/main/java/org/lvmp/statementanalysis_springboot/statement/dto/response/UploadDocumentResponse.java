@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.model;
+package org.lvmp.statementanalysis_springboot.statement.dto.response;
 
 import lombok.*;
 

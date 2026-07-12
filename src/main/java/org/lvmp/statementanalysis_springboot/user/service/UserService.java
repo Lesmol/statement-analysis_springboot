@@ -1,8 +1,8 @@
-package org.lvmp.statementanalysis_springboot.service;
+package org.lvmp.statementanalysis_springboot.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.lvmp.statementanalysis_springboot.context.UserContext;
-import org.lvmp.statementanalysis_springboot.model.UserResponse;
+import org.lvmp.statementanalysis_springboot.user.dto.response.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 

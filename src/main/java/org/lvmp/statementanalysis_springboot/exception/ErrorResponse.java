@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.model;
+package org.lvmp.statementanalysis_springboot.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

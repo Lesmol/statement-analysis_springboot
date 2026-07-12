@@ -1,10 +1,10 @@
-package org.lvmp.statementanalysis_springboot.controller;
+package org.lvmp.statementanalysis_springboot.statement.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.lvmp.statementanalysis_springboot.model.UploadDocumentRequest;
-import org.lvmp.statementanalysis_springboot.model.UploadDocumentResponse;
-import org.lvmp.statementanalysis_springboot.service.StatementService;
+import org.lvmp.statementanalysis_springboot.statement.dto.request.UploadDocumentRequest;
+import org.lvmp.statementanalysis_springboot.statement.dto.response.UploadDocumentResponse;
+import org.lvmp.statementanalysis_springboot.statement.service.StatementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

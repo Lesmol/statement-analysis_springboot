@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.lvmp</groupId>
     <artifactId>statement-analysis_springboot</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>statement-analysis_springboot</name>
     <description>statement-analysis_springboot</description>
     <url/>
