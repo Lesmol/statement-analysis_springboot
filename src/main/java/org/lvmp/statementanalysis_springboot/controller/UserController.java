@@ -3,6 +3,7 @@ package org.lvmp.statementanalysis_springboot.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.context.UserContext;
+import org.lvmp.statementanalysis_springboot.model.UserProfileResponse;
 import org.lvmp.statementanalysis_springboot.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,13 @@ public class UserController {
     private final UserContext userContext;
 
     @GetMapping
-    public ResponseEntity<UserContext> getUser() {
-        return ResponseEntity.ok(userContext);
+    public ResponseEntity<UserProfileResponse> getUser() {
+        return ResponseEntity.ok(UserProfileResponse.builder()
+                .username(userContext.getUsername())
+                .email(userContext.getEmail())
+                .emailVerified(userContext.isEmailVerified())
+                .phoneNumber(userContext.getPhoneNumber())
+                .phoneNumberVerified(userContext.isPhoneNumberVerified())
+                .build());
     }
 }
