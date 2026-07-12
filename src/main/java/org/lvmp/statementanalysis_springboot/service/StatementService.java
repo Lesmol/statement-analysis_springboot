@@ -3,6 +3,7 @@ package org.lvmp.statementanalysis_springboot.service;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lvmp.statementanalysis_springboot.context.UserContext;
 import org.lvmp.statementanalysis_springboot.model.UploadDocumentRequest;
 import org.lvmp.statementanalysis_springboot.model.UploadDocumentResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,15 +26,14 @@ public class StatementService {
     private final TextractClient textractClient;
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
-
     @Value("${aws.sns.topic}")
     private String snsTopicArn;
-
     @Value("${aws.sns.role}")
     private String roleArn;
+    private final UserContext userContext;
 
     public ResponseEntity<UploadDocumentResponse> uploadDocument(UploadDocumentRequest request) throws IOException {
-        String filename = UUID.randomUUID().toString();
+        String filename = userContext.getSub() + "/" + UUID.randomUUID();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -48,7 +48,7 @@ public class StatementService {
                         request.getFile().getSize()
                 )
         );
-        log.info("Successfully uploaded object ({}) to s3", filename);
+        log.info("{}: successfully uploaded object ({}) to s3", userContext.getEmail() ,filename);
 
         String prefix = "output/" + filename + "/";
 
@@ -79,7 +79,7 @@ public class StatementService {
                         .build();
 
         StartDocumentAnalysisResponse response = textractClient.startDocumentAnalysis(startRequest);
-        log.info("Textract jobId: {}", response.jobId());
+        log.info("{}: Textract jobId: {}", userContext.getEmail() ,response.jobId());
 
         return ResponseEntity.accepted()
                 .body(UploadDocumentResponse.builder()
