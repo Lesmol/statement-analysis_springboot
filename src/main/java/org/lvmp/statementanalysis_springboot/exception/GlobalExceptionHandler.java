@@ -1,7 +1,6 @@
 package org.lvmp.statementanalysis_springboot.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.lvmp.statementanalysis_springboot.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

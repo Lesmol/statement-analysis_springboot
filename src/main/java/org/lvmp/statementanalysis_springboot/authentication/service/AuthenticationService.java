@@ -1,12 +1,12 @@
-package org.lvmp.statementanalysis_springboot.service;
+package org.lvmp.statementanalysis_springboot.authentication.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.exception.AuthenticationException;
-import org.lvmp.statementanalysis_springboot.model.ForcePasswordChangeRequest;
-import org.lvmp.statementanalysis_springboot.model.LoginRequest;
-import org.lvmp.statementanalysis_springboot.model.LoginResponse;
-import org.lvmp.statementanalysis_springboot.model.LogoutRequest;
+import org.lvmp.statementanalysis_springboot.authentication.dto.request.ForcePasswordChangeRequest;
+import org.lvmp.statementanalysis_springboot.authentication.dto.request.LoginRequest;
+import org.lvmp.statementanalysis_springboot.authentication.dto.response.LoginResponse;
+import org.lvmp.statementanalysis_springboot.authentication.dto.request.LogoutRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CognitoAuthService {
+public class AuthenticationService {
 
     private final CognitoIdentityProviderClient cognitoClient;
 
