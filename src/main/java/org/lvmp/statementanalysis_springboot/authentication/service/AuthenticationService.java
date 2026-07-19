@@ -1,6 +1,5 @@
 package org.lvmp.statementanalysis_springboot.authentication.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.SignupRequest;
@@ -128,7 +127,7 @@ public class AuthenticationService {
         }
     }
 
-    public ResponseEntity<Void> signUp(@Valid SignupRequest request) {
+    public ResponseEntity<Void> signUp(SignupRequest request) {
         log.info("Initiated sign up for {}", request.getEmail());
         try {
             AttributeType emailAttribute = AttributeType.builder()
