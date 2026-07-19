@@ -63,7 +63,7 @@ public class AuthenticationService {
 
             return ResponseEntity.ok().body(
                     LoginResponse.builder()
-                            .gatewayToken(result.idToken())
+                            .idToken(result.idToken())
                             .accessToken(result.accessToken())
                             .refreshToken(result.refreshToken())
                             .expiresIn(result.expiresIn())
@@ -114,7 +114,7 @@ public class AuthenticationService {
 
             return ResponseEntity.ok().body(
                     LoginResponse.builder()
-                            .gatewayToken(result.idToken())
+                            .idToken(result.idToken())
                             .accessToken(result.accessToken())
                             .refreshToken(result.refreshToken())
                             .expiresIn(result.expiresIn())

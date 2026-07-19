@@ -8,7 +8,7 @@ import lombok.Data;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
-    private String gatewayToken;
+    private String idToken;
     private String accessToken;
     private String refreshToken;
     private Integer expiresIn;
