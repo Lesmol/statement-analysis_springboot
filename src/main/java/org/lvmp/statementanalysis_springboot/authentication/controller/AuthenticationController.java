@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.ForcePasswordChangeRequest;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.LoginRequest;
+import org.lvmp.statementanalysis_springboot.authentication.dto.request.SignupRequest;
 import org.lvmp.statementanalysis_springboot.authentication.dto.response.LoginResponse;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.LogoutRequest;
 import org.lvmp.statementanalysis_springboot.authentication.service.AuthenticationService;
@@ -27,6 +28,11 @@ public class AuthenticationController {
     @PostMapping("/force-password-change")
     public ResponseEntity<LoginResponse> forcePasswordChange(@RequestBody @Valid ForcePasswordChangeRequest request) {
         return authService.forcePasswordChange(request);
+    }
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<Void> signUp(@RequestBody @Valid SignupRequest request) {
+        return authService.signUp(request);
     }
 
     @PostMapping("/logout")

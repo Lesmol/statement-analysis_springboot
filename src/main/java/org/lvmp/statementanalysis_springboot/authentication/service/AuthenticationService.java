@@ -1,13 +1,16 @@
 package org.lvmp.statementanalysis_springboot.authentication.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lvmp.statementanalysis_springboot.authentication.dto.request.SignupRequest;
 import org.lvmp.statementanalysis_springboot.exception.AuthenticationException;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.ForcePasswordChangeRequest;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.LoginRequest;
 import org.lvmp.statementanalysis_springboot.authentication.dto.response.LoginResponse;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.LogoutRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -31,6 +34,8 @@ public class AuthenticationService {
     private String clientSecret;
     @Value("${aws.cognito.client-id}")
     private String clientId;
+    @Value("${aws.cognito.user-pool-id}")
+    private String userPoolId;
 
     public ResponseEntity<LoginResponse> loginWithPassword(LoginRequest request) {
         log.info("{} initiated login with password", request.getUsername());
@@ -105,6 +110,8 @@ public class AuthenticationService {
             RespondToAuthChallengeResponse challengeResponse = cognitoClient.respondToAuthChallenge(challengeRequest);
             AuthenticationResultType result = challengeResponse.authenticationResult();
 
+            verifyContactIfNeeded(request.getUsername());
+
             return ResponseEntity.ok().body(
                     LoginResponse.builder()
                             .gatewayToken(result.idToken())
@@ -119,6 +126,73 @@ public class AuthenticationService {
             log.error("Unexpected error during force password change", e);
             throw new AuthenticationException("Password change failed. Please try again.");
         }
+    }
+
+    public ResponseEntity<Void> signUp(@Valid SignupRequest request) {
+        log.info("Initiated sign up for {}", request.getEmail());
+        try {
+            AttributeType emailAttribute = AttributeType.builder()
+                    .name("email")
+                    .value(request.getEmail())
+                    .build();
+
+            AttributeType phoneAttribute = AttributeType.builder()
+                    .name("phone_number")
+                    .value(request.getPhoneNumber())
+                    .build();
+
+            AdminCreateUserRequest adminCreateUserRequest = AdminCreateUserRequest.builder()
+                    .userPoolId(userPoolId)
+                    .username(request.getEmail())
+                    .userAttributes(emailAttribute, phoneAttribute)
+                    .desiredDeliveryMediums(DeliveryMediumType.EMAIL)
+                    .build();
+
+            cognitoClient.adminCreateUser(adminCreateUserRequest);
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (UsernameExistsException e) {
+            log.warn("Sign up attempt with existing email: {}", request.getEmail());
+            throw new AuthenticationException("An account with this email already exists.");
+        } catch (InvalidParameterException e) {
+            log.warn("Sign up attempt with invalid parameters for: {}", request.getEmail());
+            throw new AuthenticationException("Invalid sign up details provided.");
+        } catch (Exception e) {
+            log.error("Unexpected error during Cognito sign up", e);
+            throw new AuthenticationException("Sign up failed. Please try again.");
+        }
+    }
+
+    private void verifyContactIfNeeded(String username) {
+        AdminGetUserRequest getUserRequest = AdminGetUserRequest.builder()
+                .userPoolId(userPoolId)
+                .username(username)
+                .build();
+
+        AdminGetUserResponse user = cognitoClient.adminGetUser(getUserRequest);
+
+        boolean emailVerified = user.userAttributes().stream()
+                .anyMatch(attr -> attr.name().equals("email_verified") && Boolean.parseBoolean(attr.value()));
+        boolean phoneVerified = user.userAttributes().stream()
+                .anyMatch(attr -> attr.name().equals("phone_number_verified") && Boolean.parseBoolean(attr.value()));
+
+        if (emailVerified && phoneVerified) {
+            return;
+        }
+
+        log.info("Marking email and phone number as verified for {}", username);
+
+        AdminUpdateUserAttributesRequest updateRequest = AdminUpdateUserAttributesRequest.builder()
+                .userPoolId(userPoolId)
+                .username(username)
+                .userAttributes(
+                        AttributeType.builder().name("email_verified").value("true").build(),
+                        AttributeType.builder().name("phone_number_verified").value("true").build()
+                )
+                .build();
+
+        cognitoClient.adminUpdateUserAttributes(updateRequest);
     }
 
     public void logout(LogoutRequest request) {
