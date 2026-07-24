@@ -1,6 +1,5 @@
 package org.lvmp.statementanalysis_springboot.statement.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.context.UserContext;
@@ -48,8 +47,17 @@ public class StatementService {
                         request.getFile().getSize()
                 )
         );
-        log.info("{}: successfully uploaded object ({}) to s3", userContext.getEmail() ,filename);
+        log.info("{}: successfully uploaded object ({}) to s3", userContext.getEmail(), filename);
 
+        if (snsTopicArn.isEmpty()) {
+            log.info("SNS Topic Arn is empty");
+        }
+
+        if (roleArn.isEmpty()) {
+            log.info("SNS Topic Arn is empty");
+        }
+
+        log.info("Textract Asynchronous Analysis starting file {}",filename);
         StartDocumentAnalysisRequest startRequest =
                 StartDocumentAnalysisRequest
                         .builder()
@@ -72,23 +80,13 @@ public class StatementService {
                         .build();
 
         StartDocumentAnalysisResponse response = textractClient.startDocumentAnalysis(startRequest);
-        log.info("{}: Textract jobId: {}", userContext.getEmail() ,response.jobId());
+        log.info("{}: Textract jobId: {}", userContext.getEmail(), response.jobId());
 
         return ResponseEntity.accepted()
                 .body(UploadDocumentResponse.builder()
                         .jobId(response.jobId())
                         .build()
                 );
-    }
-
-    @PostConstruct
-    public void validateSnsConfig() {
-        if (snsTopicArn == null || snsTopicArn.isBlank()) {
-            throw new IllegalStateException("snsTopicArn must not be blank");
-        }
-        if (roleArn == null || roleArn.isBlank()) {
-            throw new IllegalStateException("roleArn must not be blank");
-        }
     }
 
     public ResponseEntity<Void> analyseDocument() {
