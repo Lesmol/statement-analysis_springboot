@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.lvmp.statementanalysis_springboot.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.services.rdsdata.RdsDataClient;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.rdsdata.model.Field;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserRepository {
 
-    private final RdsDataClient client;
+    private final RdsStatementExecutor statementExecutor;
     @Value("${aws.rds.db-cluster-arn}")
     private String CLUSTER_ARN;
     @Value("${aws.rds.db-secret-arn}")
@@ -39,7 +38,7 @@ public class UserRepository {
                         .build())
                 .build();
 
-        ExecuteStatementResponse response = client.executeStatement(request);
+        ExecuteStatementResponse response = statementExecutor.execute(request);
 
         return response.records().stream()
                 .findFirst()
@@ -55,7 +54,7 @@ public class UserRepository {
                         .build())
                 .build();
 
-        ExecuteStatementResponse response = client.executeStatement(request);
+        ExecuteStatementResponse response = statementExecutor.execute(request);
 
         return response.records().stream()
                 .findFirst()
@@ -71,7 +70,7 @@ public class UserRepository {
                         .build())
                 .build();
 
-        ExecuteStatementResponse response = client.executeStatement(request);
+        ExecuteStatementResponse response = statementExecutor.execute(request);
 
         return !response.records().isEmpty();
     }
@@ -92,7 +91,7 @@ public class UserRepository {
                 )
                 .build();
 
-        client.executeStatement(request);
+        statementExecutor.execute(request);
 
         user.toBuilder().id(id).createdAt(now).updatedAt(now).build();
     }
@@ -111,7 +110,7 @@ public class UserRepository {
                 )
                 .build();
 
-        client.executeStatement(request);
+        statementExecutor.execute(request);
 
         return user.toBuilder().updatedAt(now).build();
     }

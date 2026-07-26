@@ -5,7 +5,6 @@ import org.lvmp.statementanalysis_springboot.models.Account;
 import org.lvmp.statementanalysis_springboot.enums.AccountType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import software.amazon.awssdk.services.rdsdata.RdsDataClient;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.rdsdata.model.Field;
@@ -20,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountRepository {
 
-    private final RdsDataClient client;
+    private final RdsStatementExecutor statementExecutor;
     @Value("${aws.rds.db-cluster-arn}")
     private String CLUSTER_ARN;
     @Value("${aws.rds.db-secret-arn}")
@@ -38,7 +37,7 @@ public class AccountRepository {
                         .build())
                 .build();
 
-        ExecuteStatementResponse response = client.executeStatement(request);
+        ExecuteStatementResponse response = statementExecutor.execute(request);
 
         return response.records().stream()
                 .findFirst()
@@ -55,7 +54,7 @@ public class AccountRepository {
                         .build())
                 .build();
 
-        ExecuteStatementResponse response = client.executeStatement(request);
+        ExecuteStatementResponse response = statementExecutor.execute(request);
 
         return response.records().stream()
                 .map(this::mapRowToAccount)
@@ -80,12 +79,12 @@ public class AccountRepository {
                 )
                 .build();
 
-        client.executeStatement(request);
+        statementExecutor.execute(request);
 
         account.toBuilder().id(id).createdAt(now).updatedAt(now).build();
     }
 
-    public Account update(Account account) {
+    public void update(Account account) {
         Instant now = Instant.now();
 
         ExecuteStatementRequest request = requestBuilder()
@@ -100,9 +99,9 @@ public class AccountRepository {
                 )
                 .build();
 
-        client.executeStatement(request);
+        statementExecutor.execute(request);
 
-        return account.toBuilder().updatedAt(now).build();
+        account.toBuilder().updatedAt(now).build();
     }
 
     private ExecuteStatementRequest.Builder requestBuilder() {
