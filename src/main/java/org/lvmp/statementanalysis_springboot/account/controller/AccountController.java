@@ -22,7 +22,7 @@ public class AccountController {
         return accountService.getAccount(accountId);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<AccountResponse>> getAccounts() {
         return accountService.getAccounts();
     }
