@@ -7,12 +7,14 @@ import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.rdsdata.model.Field;
-import software.amazon.awssdk.services.rdsdata.model.SqlParameter;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.stringParam;
+import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.timestampParam;
+import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.uuidParam;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,10 +34,7 @@ public class UserRepository {
                 .secretArn(SECRET_ARN)
                 .database(DATABASE)
                 .sql("SELECT id, email, phone_number FROM users WHERE id = :id")
-                .parameters(SqlParameter.builder()
-                        .name("id")
-                        .value(Field.builder().stringValue(id.toString()).build())
-                        .build())
+                .parameters(uuidParam("id", id))
                 .build();
 
         ExecuteStatementResponse response = statementExecutor.execute(request);
@@ -48,10 +47,7 @@ public class UserRepository {
     public Optional<User> findByEmail(String email) {
         ExecuteStatementRequest request = requestBuilder()
                 .sql("SELECT id, email, phone_number FROM users WHERE email = :email")
-                .parameters(SqlParameter.builder()
-                        .name("email")
-                        .value(Field.builder().stringValue(email).build())
-                        .build())
+                .parameters(stringParam("email", email))
                 .build();
 
         ExecuteStatementResponse response = statementExecutor.execute(request);
@@ -64,10 +60,7 @@ public class UserRepository {
     public boolean existsByEmail(String email) {
         ExecuteStatementRequest request = requestBuilder()
                 .sql("SELECT 1 FROM users WHERE email = :email")
-                .parameters(SqlParameter.builder()
-                        .name("email")
-                        .value(Field.builder().stringValue(email).build())
-                        .build())
+                .parameters(stringParam("email", email))
                 .build();
 
         ExecuteStatementResponse response = statementExecutor.execute(request);
@@ -83,11 +76,11 @@ public class UserRepository {
                 .sql("INSERT INTO users (id, email, phone_number, created_at, updated_at) "
                         + "VALUES (:id, :email, :phoneNumber, :createdAt, :updatedAt)")
                 .parameters(
-                        SqlParameter.builder().name("id").value(Field.builder().stringValue(id.toString()).build()).build(),
-                        SqlParameter.builder().name("email").value(Field.builder().stringValue(user.getEmail()).build()).build(),
-                        SqlParameter.builder().name("phoneNumber").value(Field.builder().stringValue(user.getPhoneNumber()).build()).build(),
-                        SqlParameter.builder().name("createdAt").value(Field.builder().stringValue(now.toString()).build()).build(),
-                        SqlParameter.builder().name("updatedAt").value(Field.builder().stringValue(now.toString()).build()).build()
+                        uuidParam("id", id),
+                        stringParam("email", user.getEmail()),
+                        stringParam("phoneNumber", user.getPhoneNumber()),
+                        timestampParam("createdAt", now),
+                        timestampParam("updatedAt", now)
                 )
                 .build();
 
@@ -103,10 +96,10 @@ public class UserRepository {
                 .sql("UPDATE users SET email = :email, phone_number = :phoneNumber, "
                         + "updated_at = :updatedAt WHERE id = :id")
                 .parameters(
-                        SqlParameter.builder().name("id").value(Field.builder().stringValue(user.getId().toString()).build()).build(),
-                        SqlParameter.builder().name("email").value(Field.builder().stringValue(user.getEmail()).build()).build(),
-                        SqlParameter.builder().name("phoneNumber").value(Field.builder().stringValue(user.getPhoneNumber()).build()).build(),
-                        SqlParameter.builder().name("updatedAt").value(Field.builder().stringValue(now.toString()).build()).build()
+                        uuidParam("id", user.getId()),
+                        stringParam("email", user.getEmail()),
+                        stringParam("phoneNumber", user.getPhoneNumber()),
+                        timestampParam("updatedAt", now)
                 )
                 .build();
 

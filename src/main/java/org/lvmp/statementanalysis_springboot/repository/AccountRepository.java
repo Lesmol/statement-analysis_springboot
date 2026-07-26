@@ -8,12 +8,15 @@ import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementResponse;
 import software.amazon.awssdk.services.rdsdata.model.Field;
-import software.amazon.awssdk.services.rdsdata.model.SqlParameter;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.stringParam;
+import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.timestampParam;
+import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.uuidParam;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,10 +34,7 @@ public class AccountRepository {
         ExecuteStatementRequest request = requestBuilder()
                 .sql("SELECT id, user_id, account_name, account_number, account_type, created_at, updated_at "
                         + "FROM accounts WHERE id = :id")
-                .parameters(SqlParameter.builder()
-                        .name("id")
-                        .value(Field.builder().stringValue(id.toString()).build())
-                        .build())
+                .parameters(uuidParam("id", id))
                 .build();
 
         ExecuteStatementResponse response = statementExecutor.execute(request);
@@ -48,10 +48,7 @@ public class AccountRepository {
         ExecuteStatementRequest request = requestBuilder()
                 .sql("SELECT id, user_id, account_name, account_number, account_type, created_at, updated_at "
                         + "FROM accounts WHERE user_id = :userId")
-                .parameters(SqlParameter.builder()
-                        .name("userId")
-                        .value(Field.builder().stringValue(userId.toString()).build())
-                        .build())
+                .parameters(uuidParam("userId", userId))
                 .build();
 
         ExecuteStatementResponse response = statementExecutor.execute(request);
@@ -69,13 +66,13 @@ public class AccountRepository {
                 .sql("INSERT INTO accounts (id, user_id, account_name, account_number, account_type, created_at, updated_at) "
                         + "VALUES (:id, :userId, :accountName, :accountNumber, :accountType, :createdAt, :updatedAt)")
                 .parameters(
-                        SqlParameter.builder().name("id").value(Field.builder().stringValue(id.toString()).build()).build(),
-                        SqlParameter.builder().name("userId").value(Field.builder().stringValue(account.getUserId().toString()).build()).build(),
-                        SqlParameter.builder().name("accountName").value(Field.builder().stringValue(account.getAccountName()).build()).build(),
-                        SqlParameter.builder().name("accountNumber").value(Field.builder().stringValue(account.getAccountNumber()).build()).build(),
-                        SqlParameter.builder().name("accountType").value(Field.builder().stringValue(account.getAccountType().name()).build()).build(),
-                        SqlParameter.builder().name("createdAt").value(Field.builder().stringValue(now.toString()).build()).build(),
-                        SqlParameter.builder().name("updatedAt").value(Field.builder().stringValue(now.toString()).build()).build()
+                        uuidParam("id", id),
+                        uuidParam("userId", account.getUserId()),
+                        stringParam("accountName", account.getAccountName()),
+                        stringParam("accountNumber", account.getAccountNumber()),
+                        stringParam("accountType", account.getAccountType().name()),
+                        timestampParam("createdAt", now),
+                        timestampParam("updatedAt", now)
                 )
                 .build();
 
@@ -91,11 +88,11 @@ public class AccountRepository {
                 .sql("UPDATE accounts SET account_name = :accountName, account_number = :accountNumber, "
                         + "account_type = :accountType, updated_at = :updatedAt WHERE id = :id")
                 .parameters(
-                        SqlParameter.builder().name("id").value(Field.builder().stringValue(account.getId().toString()).build()).build(),
-                        SqlParameter.builder().name("accountName").value(Field.builder().stringValue(account.getAccountName()).build()).build(),
-                        SqlParameter.builder().name("accountNumber").value(Field.builder().stringValue(account.getAccountNumber()).build()).build(),
-                        SqlParameter.builder().name("accountType").value(Field.builder().stringValue(account.getAccountType().name()).build()).build(),
-                        SqlParameter.builder().name("updatedAt").value(Field.builder().stringValue(now.toString()).build()).build()
+                        uuidParam("id", account.getId()),
+                        stringParam("accountName", account.getAccountName()),
+                        stringParam("accountNumber", account.getAccountNumber()),
+                        stringParam("accountType", account.getAccountType().name()),
+                        timestampParam("updatedAt", now)
                 )
                 .build();
 
