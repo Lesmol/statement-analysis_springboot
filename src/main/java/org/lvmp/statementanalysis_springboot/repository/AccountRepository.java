@@ -115,8 +115,8 @@ public class AccountRepository {
                 .accountName(row.get(2).stringValue())
                 .accountNumber(row.get(3).stringValue())
                 .accountType(AccountType.valueOf(row.get(4).stringValue()))
-                .createdAt(Instant.parse(row.get(5).stringValue()))
-                .updatedAt(Instant.parse(row.get(6).stringValue()))
+                .createdAt(SqlParameters.parseTimestamp(row.get(5).stringValue()))
+                .updatedAt(SqlParameters.parseTimestamp(row.get(6).stringValue()))
                 .build();
     }
 }
