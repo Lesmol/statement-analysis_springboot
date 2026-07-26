@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.SignupRequest;
 import org.lvmp.statementanalysis_springboot.exception.AuthenticationException;
+import org.lvmp.statementanalysis_springboot.exception.DatabaseException;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.ForcePasswordChangeRequest;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.LoginRequest;
 import org.lvmp.statementanalysis_springboot.authentication.dto.response.LoginResponse;
 import org.lvmp.statementanalysis_springboot.authentication.dto.request.LogoutRequest;
+import org.lvmp.statementanalysis_springboot.models.User;
+import org.lvmp.statementanalysis_springboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +23,16 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthenticationService {
-
     private final CognitoIdentityProviderClient cognitoClient;
+    private final UserRepository userRepository;
 
     @Value("${aws.cognito.client-secret}")
     private String clientSecret;
@@ -58,6 +63,8 @@ public class AuthenticationService {
                 );
             }
 
+            addUserToDb(request.getUsername());
+
             AuthenticationResultType result = authResponse.authenticationResult();
 
             return ResponseEntity.ok().body(
@@ -73,17 +80,15 @@ public class AuthenticationService {
         } catch (NotAuthorizedException e) {
             log.warn("Failed login attempt for user: {}", request.getUsername());
             throw new AuthenticationException("Invalid username or password");
-
         } catch (UserNotFoundException e) {
             log.warn("Login attempt for non-existent user: {}", request.getUsername());
             throw new AuthenticationException("Invalid username or password");
-
         } catch (UserNotConfirmedException e) {
             throw new AuthenticationException("Account is not confirmed. Please check your email for a verification link.");
         } catch (TooManyRequestsException | LimitExceededException e) {
             log.warn("Rate limit hit for user: {}", request.getUsername());
             throw new AuthenticationException("Too many requests. Please try again later.");
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationException | DatabaseException e) {
             throw e;
         } catch (Exception e) {
             log.error("Unexpected error during Cognito authentication", e);
@@ -228,5 +233,43 @@ public class AuthenticationService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to compute Cognito SECRET_HASH", e);
         }
+    }
+
+    private void addUserToDb(String username) {
+        boolean userExists = userRepository.existsByEmail(username);
+
+        if (userExists) return;
+
+        AdminGetUserRequest getUserRequest = AdminGetUserRequest.builder()
+                .userPoolId(userPoolId)
+                .username(username)
+                .build();
+
+        AdminGetUserResponse cognitoUser = cognitoClient.adminGetUser(getUserRequest);
+
+        String sub = getAttribute(cognitoUser.userAttributes(), "sub");
+        String email = getAttribute(cognitoUser.userAttributes(), "email");
+        String phoneNumber = getAttribute(cognitoUser.userAttributes(), "phone_number");
+
+        try {
+            User user = User.builder()
+                    .id(UUID.fromString(sub))
+                    .email(email)
+                    .phoneNumber(phoneNumber)
+                    .build();
+
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("Failed to save user {} to the database", username, e);
+            throw new DatabaseException("Failed to save user to the database", e);
+        }
+    }
+
+    private String getAttribute(List<AttributeType> attributes, String name) {
+        return attributes.stream()
+                .filter(attribute -> attribute.name().equals(name))
+                .map(AttributeType::value)
+                .findFirst()
+                .orElse(null);
     }
 }

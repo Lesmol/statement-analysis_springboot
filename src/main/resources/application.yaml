@@ -17,6 +17,10 @@ aws:
     role: ${AWS_SNS_ROLE}
   kms:
     key-id: ${AWS_KMS_KEY_ALIAS}
+  rds:
+    db-name: ${DB_NAME}
+    db-cluster-arn: ${DB_CLUSTER_ARN}
+    db-secret-arn: ${DB_SECRET_ARN}
 logging:
   structured:
     format:
