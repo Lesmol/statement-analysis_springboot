@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.lvmp.statementanalysis_springboot.enums.AccountType;
 
 @Data
@@ -14,6 +15,6 @@ public class AccountRequest {
     private String accountName;
     @NotBlank
     private String accountNumber;
-    @NotBlank
+    @NonNull
     private AccountType accountType;
 }
