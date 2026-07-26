@@ -106,6 +106,13 @@
             <artifactId>cognitoidentityprovider</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>software.amazon.encryption.s3</groupId>
+            <artifactId>amazon-s3-encryption-client-java</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
