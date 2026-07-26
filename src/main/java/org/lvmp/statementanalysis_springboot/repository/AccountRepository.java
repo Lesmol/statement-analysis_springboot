@@ -59,7 +59,7 @@ public class AccountRepository {
     }
 
     public void save(Account account) {
-        UUID id = account.getId() != null ? account.getId() : UUID.randomUUID();
+        UUID id = UUID.randomUUID();
         Instant now = Instant.now();
 
         ExecuteStatementRequest request = requestBuilder()
