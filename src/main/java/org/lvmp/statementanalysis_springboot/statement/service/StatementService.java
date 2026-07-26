@@ -49,14 +49,6 @@ public class StatementService {
         );
         log.info("{}: successfully uploaded object ({}) to s3", userContext.getEmail(), filename);
 
-        if (snsTopicArn.isEmpty()) {
-            log.info("SNS Topic Arn is empty");
-        }
-
-        if (roleArn.isEmpty()) {
-            log.info("SNS Topic Arn is empty");
-        }
-
         log.info("Textract Asynchronous Analysis starting file {}",filename);
         StartDocumentAnalysisRequest startRequest =
                 StartDocumentAnalysisRequest
@@ -67,7 +59,7 @@ public class StatementService {
                                         .name(filename)
                                         .build())
                                 .build())
-                        .clientRequestToken(filename)
+                        .clientRequestToken(UUID.randomUUID().toString())
                         .notificationChannel(
                                 NotificationChannel
                                         .builder()
