@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.validation;
+package org.lvmp.statementanalysis_springboot.shared.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

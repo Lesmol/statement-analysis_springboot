@@ -5,7 +5,7 @@ spring:
     multipart:
       max-file-size: 5MB
 
-aws:
+app:
   cognito:
     user-pool-id: ${COGNITO_USER_POOL_ID}
     client-id: ${COGNITO_CLIENT_ID}

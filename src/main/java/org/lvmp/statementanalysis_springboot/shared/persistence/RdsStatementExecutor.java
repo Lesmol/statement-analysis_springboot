@@ -1,8 +1,8 @@
-package org.lvmp.statementanalysis_springboot.repository;
+package org.lvmp.statementanalysis_springboot.shared.persistence;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lvmp.statementanalysis_springboot.exception.DatabaseException;
+import org.lvmp.statementanalysis_springboot.shared.exception.DatabaseException;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.rdsdata.RdsDataClient;
 import software.amazon.awssdk.services.rdsdata.model.DatabaseResumingException;

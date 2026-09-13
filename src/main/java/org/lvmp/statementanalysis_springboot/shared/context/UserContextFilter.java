@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.context;
+package org.lvmp.statementanalysis_springboot.shared.context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -19,10 +19,8 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class UserContextFilter extends OncePerRequestFilter {
-
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
-
     private final UserContext userContext;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -45,11 +43,6 @@ public class UserContextFilter extends OncePerRequestFilter {
     @SuppressWarnings("unchecked")
     private void populateUserContext(String token) throws IOException {
         String[] parts = token.split("\\.");
-        if (parts.length < 2) {
-            log.warn("Bearer token is not a well-formed JWT");
-            return;
-        }
-
         byte[] payload = Base64.getUrlDecoder().decode(parts[1]);
         Map<String, Object> claims = objectMapper.readValue(payload, Map.class);
 

@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.exception;
+package org.lvmp.statementanalysis_springboot.shared.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

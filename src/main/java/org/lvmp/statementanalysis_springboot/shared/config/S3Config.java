@@ -1,6 +1,7 @@
-package org.lvmp.statementanalysis_springboot.config;
+package org.lvmp.statementanalysis_springboot.shared.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.lvmp.statementanalysis_springboot.shared.config.properties.ApplicationConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -9,9 +10,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.encryption.s3.S3EncryptionClient;
 
 @Configuration
+@RequiredArgsConstructor
 public class S3Config {
-    @Value("${aws.kms.key-id}")
-    private String kmsKeyId;
+    private final ApplicationConfigurationProperties configurationProperties;
 
     @Bean
     @Primary
@@ -24,7 +25,7 @@ public class S3Config {
     @Bean
     public S3EncryptionClient s3EncryptionClient() {
         return S3EncryptionClient.builderV4()
-                .kmsKeyId(kmsKeyId)
+                .kmsKeyId(configurationProperties.kms().keyId())
                 .enableLegacyUnauthenticatedModes(false)
                 .build();
     }

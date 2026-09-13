@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.config;
+package org.lvmp.statementanalysis_springboot.shared.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

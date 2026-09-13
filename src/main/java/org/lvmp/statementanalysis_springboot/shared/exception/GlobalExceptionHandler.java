@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.exception;
+package org.lvmp.statementanalysis_springboot.shared.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

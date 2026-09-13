@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.exception;
+package org.lvmp.statementanalysis_springboot.shared.exception;
 
 public class AuthenticationException extends RuntimeException {
     public AuthenticationException(String message) {
