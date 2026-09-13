@@ -1,8 +1,8 @@
-package org.lvmp.statementanalysis_springboot.repository;
+package org.lvmp.statementanalysis_springboot.user.internal;
 
 import lombok.RequiredArgsConstructor;
-import org.lvmp.statementanalysis_springboot.models.User;
-import org.springframework.beans.factory.annotation.Value;
+import org.lvmp.statementanalysis_springboot.shared.config.properties.ApplicationConfigurationProperties;
+import org.lvmp.statementanalysis_springboot.shared.persistence.RdsStatementExecutor;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementRequest;
 import software.amazon.awssdk.services.rdsdata.model.ExecuteStatementResponse;
@@ -12,27 +12,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.stringParam;
-import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.timestampParam;
-import static org.lvmp.statementanalysis_springboot.repository.SqlParameters.uuidParam;
+import static org.lvmp.statementanalysis_springboot.shared.persistence.SqlParameters.stringParam;
+import static org.lvmp.statementanalysis_springboot.shared.persistence.SqlParameters.timestampParam;
+import static org.lvmp.statementanalysis_springboot.shared.persistence.SqlParameters.uuidParam;
 
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
 
     private final RdsStatementExecutor statementExecutor;
-    @Value("${aws.rds.db-cluster-arn}")
-    private String CLUSTER_ARN;
-    @Value("${aws.rds.db-secret-arn}")
-    private String SECRET_ARN;
-    @Value("${aws.rds.db-name}")
-    private String DATABASE;
+    private final ApplicationConfigurationProperties configurationProperties;
 
     public Optional<User> findById(UUID id) {
-        ExecuteStatementRequest request = ExecuteStatementRequest.builder()
-                .resourceArn(CLUSTER_ARN)
-                .secretArn(SECRET_ARN)
-                .database(DATABASE)
+        ExecuteStatementRequest request = requestBuilder()
                 .sql("SELECT id, email, phone_number FROM users WHERE id = :id")
                 .parameters(uuidParam("id", id))
                 .build();
@@ -109,10 +101,11 @@ public class UserRepository {
     }
 
     private ExecuteStatementRequest.Builder requestBuilder() {
+        var rds = configurationProperties.rds();
         return ExecuteStatementRequest.builder()
-                .resourceArn(CLUSTER_ARN)
-                .secretArn(SECRET_ARN)
-                .database(DATABASE);
+                .resourceArn(rds.dbClusterArn())
+                .secretArn(rds.dbSecretArn())
+                .database(rds.dbName());
     }
 
     private User mapRowToUser(List<Field> row) {

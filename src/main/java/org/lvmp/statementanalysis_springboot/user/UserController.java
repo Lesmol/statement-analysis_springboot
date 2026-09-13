@@ -1,9 +1,8 @@
-package org.lvmp.statementanalysis_springboot.user.controller;
+package org.lvmp.statementanalysis_springboot.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lvmp.statementanalysis_springboot.user.dto.response.UserResponse;
-import org.lvmp.statementanalysis_springboot.user.service.UserService;
+import org.lvmp.statementanalysis_springboot.user.internal.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/user/v1")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;

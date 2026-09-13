@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.models;
+package org.lvmp.statementanalysis_springboot.user.internal;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
