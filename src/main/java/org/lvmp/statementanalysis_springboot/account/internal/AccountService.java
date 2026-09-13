@@ -1,12 +1,10 @@
-package org.lvmp.statementanalysis_springboot.account.service;
+package org.lvmp.statementanalysis_springboot.account.internal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lvmp.statementanalysis_springboot.account.dto.response.AccountResponse;
-import org.lvmp.statementanalysis_springboot.account.dto.request.AccountRequest;
-import org.lvmp.statementanalysis_springboot.context.UserContext;
-import org.lvmp.statementanalysis_springboot.models.Account;
-import org.lvmp.statementanalysis_springboot.repository.AccountRepository;
+import org.lvmp.statementanalysis_springboot.account.AccountResponse;
+import org.lvmp.statementanalysis_springboot.account.AccountRequest;
+import org.lvmp.statementanalysis_springboot.shared.context.UserContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

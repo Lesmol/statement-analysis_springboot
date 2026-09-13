@@ -1,10 +1,10 @@
-package org.lvmp.statementanalysis_springboot.models;
+package org.lvmp.statementanalysis_springboot.account.internal;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.lvmp.statementanalysis_springboot.enums.AccountType;
+import org.lvmp.statementanalysis_springboot.account.AccountType;
 
 import java.time.Instant;
 import java.util.UUID;

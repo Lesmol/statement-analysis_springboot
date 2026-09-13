@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.enums;
+package org.lvmp.statementanalysis_springboot.account;
 
 public enum AccountType {
     SAVINGS,

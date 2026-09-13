@@ -1,10 +1,8 @@
-package org.lvmp.statementanalysis_springboot.account.controller;
+package org.lvmp.statementanalysis_springboot.account;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.lvmp.statementanalysis_springboot.account.dto.response.AccountResponse;
-import org.lvmp.statementanalysis_springboot.account.dto.request.AccountRequest;
-import org.lvmp.statementanalysis_springboot.account.service.AccountService;
+import org.lvmp.statementanalysis_springboot.account.internal.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/account")
+@RequestMapping("api/account/v1")
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
