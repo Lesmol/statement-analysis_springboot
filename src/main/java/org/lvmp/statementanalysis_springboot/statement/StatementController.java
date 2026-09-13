@@ -1,17 +1,15 @@
-package org.lvmp.statementanalysis_springboot.statement.controller;
+package org.lvmp.statementanalysis_springboot.statement;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.lvmp.statementanalysis_springboot.statement.dto.request.UploadDocumentRequest;
-import org.lvmp.statementanalysis_springboot.statement.dto.response.UploadDocumentResponse;
-import org.lvmp.statementanalysis_springboot.statement.service.StatementService;
+import org.lvmp.statementanalysis_springboot.statement.internal.StatementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/statement-analysis")
+@RequestMapping("/api/statement-analysis/v1")
 @RequiredArgsConstructor
 public class StatementController {
     private final StatementService statementService;

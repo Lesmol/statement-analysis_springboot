@@ -1,11 +1,11 @@
-package org.lvmp.statementanalysis_springboot.statement.service;
+package org.lvmp.statementanalysis_springboot.statement.internal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lvmp.statementanalysis_springboot.context.UserContext;
-import org.lvmp.statementanalysis_springboot.statement.dto.request.UploadDocumentRequest;
-import org.lvmp.statementanalysis_springboot.statement.dto.response.UploadDocumentResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.lvmp.statementanalysis_springboot.shared.config.properties.ApplicationConfigurationProperties;
+import org.lvmp.statementanalysis_springboot.shared.context.UserContext;
+import org.lvmp.statementanalysis_springboot.statement.UploadDocumentRequest;
+import org.lvmp.statementanalysis_springboot.statement.UploadDocumentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -22,17 +22,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StatementService {
     private final S3Client s3Client;
-    private final TextractClient textractClient;
-    @Value("${aws.s3.bucket-name}")
-    private String bucketName;
-    @Value("${aws.sns.topic}")
-    private String snsTopicArn;
-    @Value("${aws.sns.role}")
-    private String roleArn;
     private final UserContext userContext;
+    private final TextractClient textractClient;
+    private final ApplicationConfigurationProperties configurationProperties;
 
     public ResponseEntity<UploadDocumentResponse> uploadDocument(UploadDocumentRequest request) throws IOException {
         String filename = userContext.getSub() + "/" + UUID.randomUUID();
+        String bucketName = configurationProperties.s3().bucketName();
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -49,7 +45,7 @@ public class StatementService {
         );
         log.info("{}: successfully uploaded object ({}) to s3", userContext.getEmail(), filename);
 
-        log.info("Textract Asynchronous Analysis starting file {}",filename);
+        log.info("Textract Asynchronous Analysis starting file {}", filename);
         StartDocumentAnalysisRequest startRequest =
                 StartDocumentAnalysisRequest
                         .builder()
@@ -63,8 +59,8 @@ public class StatementService {
                         .notificationChannel(
                                 NotificationChannel
                                         .builder()
-                                        .snsTopicArn(snsTopicArn)
-                                        .roleArn(roleArn)
+                                        .snsTopicArn(configurationProperties.sns().topic())
+                                        .roleArn(configurationProperties.sns().role())
                                         .build()
                         )
                         .featureTypes(FeatureType.TABLES)

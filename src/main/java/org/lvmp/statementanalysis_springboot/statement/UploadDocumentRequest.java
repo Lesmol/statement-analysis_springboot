@@ -1,8 +1,8 @@
-package org.lvmp.statementanalysis_springboot.statement.dto.request;
+package org.lvmp.statementanalysis_springboot.statement;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.lvmp.statementanalysis_springboot.validation.PdfFile;
+import org.lvmp.statementanalysis_springboot.shared.validation.PdfFile;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
