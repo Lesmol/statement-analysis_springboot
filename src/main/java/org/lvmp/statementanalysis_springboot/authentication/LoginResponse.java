@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.authentication.dto.response;
+package org.lvmp.statementanalysis_springboot.authentication;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

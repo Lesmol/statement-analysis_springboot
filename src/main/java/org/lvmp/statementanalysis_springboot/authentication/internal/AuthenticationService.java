@@ -1,17 +1,17 @@
-package org.lvmp.statementanalysis_springboot.authentication.service;
+package org.lvmp.statementanalysis_springboot.authentication.internal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.SignupRequest;
-import org.lvmp.statementanalysis_springboot.exception.AuthenticationException;
-import org.lvmp.statementanalysis_springboot.exception.DatabaseException;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.ForcePasswordChangeRequest;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.LoginRequest;
-import org.lvmp.statementanalysis_springboot.authentication.dto.response.LoginResponse;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.LogoutRequest;
-import org.lvmp.statementanalysis_springboot.models.User;
-import org.lvmp.statementanalysis_springboot.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Value;
+import org.lvmp.statementanalysis_springboot.authentication.UserAuthenticated;
+import org.lvmp.statementanalysis_springboot.authentication.SignupRequest;
+import org.lvmp.statementanalysis_springboot.shared.exception.AuthenticationException;
+import org.lvmp.statementanalysis_springboot.shared.exception.DatabaseException;
+import org.lvmp.statementanalysis_springboot.authentication.ForcePasswordChangeRequest;
+import org.lvmp.statementanalysis_springboot.authentication.LoginRequest;
+import org.lvmp.statementanalysis_springboot.authentication.LoginResponse;
+import org.lvmp.statementanalysis_springboot.authentication.LogoutRequest;
+import org.lvmp.statementanalysis_springboot.shared.config.properties.ApplicationConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,21 +25,14 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final CognitoIdentityProviderClient cognitoClient;
-    private final UserRepository userRepository;
-
-    @Value("${aws.cognito.client-secret}")
-    private String clientSecret;
-    @Value("${aws.cognito.client-id}")
-    private String clientId;
-    @Value("${aws.cognito.user-pool-id}")
-    private String userPoolId;
+    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationConfigurationProperties configurationProperties;
 
     public ResponseEntity<LoginResponse> loginWithPassword(LoginRequest request) {
         log.info("{} initiated login with password", request.getUsername());
@@ -48,7 +41,7 @@ public class AuthenticationService {
         try {
             InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
                     .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
-                    .clientId(clientId)
+                    .clientId(configurationProperties.cognito().clientId())
                     .authParameters(authParams)
                     .build();
 
@@ -63,7 +56,7 @@ public class AuthenticationService {
                 );
             }
 
-            addUserToDb(request.getUsername());
+            publishUserAuthenticated(request.getUsername());
 
             AuthenticationResultType result = authResponse.authenticationResult();
 
@@ -106,7 +99,7 @@ public class AuthenticationService {
 
             RespondToAuthChallengeRequest challengeRequest = RespondToAuthChallengeRequest.builder()
                     .challengeName(ChallengeNameType.NEW_PASSWORD_REQUIRED)
-                    .clientId(clientId)
+                    .clientId(configurationProperties.cognito().clientId())
                     .session(request.getSession())
                     .challengeResponses(challengeResponses)
                     .build();
@@ -146,7 +139,7 @@ public class AuthenticationService {
                     .build();
 
             AdminCreateUserRequest adminCreateUserRequest = AdminCreateUserRequest.builder()
-                    .userPoolId(userPoolId)
+                    .userPoolId(configurationProperties.cognito().userPoolId())
                     .username(request.getEmail())
                     .userAttributes(emailAttribute, phoneAttribute)
                     .desiredDeliveryMediums(DeliveryMediumType.EMAIL)
@@ -169,6 +162,8 @@ public class AuthenticationService {
     }
 
     private void verifyContactIfNeeded(String username) {
+        String userPoolId = configurationProperties.cognito().userPoolId();
+
         AdminGetUserRequest getUserRequest = AdminGetUserRequest.builder()
                 .userPoolId(userPoolId)
                 .username(username)
@@ -223,10 +218,10 @@ public class AuthenticationService {
 
     private String computeSecretHash(String username) {
         try {
-            String message = username + clientId;
+            String message = username + configurationProperties.cognito().clientId();
             Mac mac = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKey = new SecretKeySpec(
-                    clientSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+                    configurationProperties.cognito().clientSecret().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
             mac.init(secretKey);
             byte[] hash = mac.doFinal(message.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
@@ -235,13 +230,9 @@ public class AuthenticationService {
         }
     }
 
-    private void addUserToDb(String username) {
-        boolean userExists = userRepository.existsByEmail(username);
-
-        if (userExists) return;
-
+    private void publishUserAuthenticated(String username) {
         AdminGetUserRequest getUserRequest = AdminGetUserRequest.builder()
-                .userPoolId(userPoolId)
+                .userPoolId(configurationProperties.cognito().userPoolId())
                 .username(username)
                 .build();
 
@@ -251,18 +242,7 @@ public class AuthenticationService {
         String email = getAttribute(cognitoUser.userAttributes(), "email");
         String phoneNumber = getAttribute(cognitoUser.userAttributes(), "phone_number");
 
-        try {
-            User user = User.builder()
-                    .id(UUID.fromString(sub))
-                    .email(email)
-                    .phoneNumber(phoneNumber)
-                    .build();
-
-            userRepository.save(user);
-        } catch (Exception e) {
-            log.error("Failed to save user {} to the database", username, e);
-            throw new DatabaseException("Failed to save user to the database", e);
-        }
+        eventPublisher.publishEvent(new UserAuthenticated(sub, email, phoneNumber));
     }
 
     private String getAttribute(List<AttributeType> attributes, String name) {

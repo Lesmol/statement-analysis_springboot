@@ -1,13 +1,8 @@
-package org.lvmp.statementanalysis_springboot.authentication.controller;
+package org.lvmp.statementanalysis_springboot.authentication;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.ForcePasswordChangeRequest;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.LoginRequest;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.SignupRequest;
-import org.lvmp.statementanalysis_springboot.authentication.dto.response.LoginResponse;
-import org.lvmp.statementanalysis_springboot.authentication.dto.request.LogoutRequest;
-import org.lvmp.statementanalysis_springboot.authentication.service.AuthenticationService;
+import org.lvmp.statementanalysis_springboot.authentication.internal.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth/v1")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authService;

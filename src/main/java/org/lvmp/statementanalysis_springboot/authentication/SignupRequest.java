@@ -1,4 +1,4 @@
-package org.lvmp.statementanalysis_springboot.authentication.dto.request;
+package org.lvmp.statementanalysis_springboot.authentication;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
